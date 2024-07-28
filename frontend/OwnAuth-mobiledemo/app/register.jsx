@@ -15,35 +15,40 @@ import {
 } from "react-native";
 import { Link } from "expo-router";
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const [credentials, setCredentials] = useState({});
 
-  const [fieldsFilled, setFieldsFilled] = useState(true);
+    //Add the error text if fields not filled
+  function RegisterUser() {
+    //Send over credentials to API
 
-  function VerifyLogin() {
-    console.log("Nothing to show :(");
-    //Send credentials to API for verification
+    //if response OK then redirect to homepage
 
-    //Route to homepage if successful verification
-
-    //Handle Sessions
+    //if response BAD then show error
   }
-
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <StatusBar barStyle="dark-content" />
           <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Register</Text>
           </View>
           <KeyboardAvoidingView
             style={styles.inputContainer}
             behavior="padding"
           >
-            {fieldsFilled ? null : <Text style={styles.errorText}>Please fill out all the fields</Text> }
+            <Text style={styles.inputText}>Username</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={setUsername}
+              value={username}
+              placeholder="Username"
+            />
             <Text style={styles.inputText}>Email</Text>
             <TextInput
               style={styles.input}
@@ -53,36 +58,38 @@ const Login = () => {
             />
             <Text style={styles.inputText}>Password</Text>
             <TextInput
-            secureTextEntry={true}
+              secureTextEntry={true}
               style={styles.input}
-              placeholder="Password"
               onChangeText={setPassword}
               value={password}
+              placeholder="Password"
             />
             <TouchableOpacity style={styles.inputButton}>
               <Text
                 style={styles.buttonText}
                 onPress={() => {
-                  if (email != "" && password != "") {
-                    setFieldsFilled(true);
-                    setCredentials({ email: email, password: password });
-                    console.log("Wawawa")
-                    VerifyLogin();
+                  if (email != "" && password != "" && username != "") {
+                    setCredentials({
+                      username: username,
+                      email: email,
+                      password: password,
+                    });
+
+                    RegisterUser();
                   }
-                  setFieldsFilled(false);
+
                   console.log(credentials);
                 }}
               >
-                Login
+                Register
               </Text>
             </TouchableOpacity>
             <Text style={styles.registerText}>
-              New to BadTwitter?{" "}
-              <Link href="/register" style={styles.registerLink}>
-                Register
+              Already a user?{" "}
+              <Link href="/" style={styles.registerLink}>
+                Login
               </Link>
             </Text>
-            
           </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
@@ -90,7 +97,7 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
 
 const styles = StyleSheet.create({
   container: {
@@ -100,9 +107,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   inputContainer: {
-    flex: 1,
-    paddingTop: 0,
+    flex: 2,
+    paddingTop: 85,
     margin: 10,
+    marginTop: 0,
     margin: "auto",
   },
   title: {
@@ -144,9 +152,4 @@ const styles = StyleSheet.create({
   registerLink: {
     color: "#0086d4",
   },
-  errorText: {
-    textAlign: "center",
-    color: "red",
-    padding: 10
-  }
 });
