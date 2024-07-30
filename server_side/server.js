@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
   res.send('Server is up and alive.')
 })
 
-app.get('/login',async (req, res) => {
+app.post('/login',async (req, res) => {
     const bodyData = req.body;
     console.log(bodyData);
 
@@ -44,6 +44,7 @@ app.get('/login',async (req, res) => {
         let hashedPword =  hashPassword(inputPassword, dbSalt);
 
         if(hashedPword != dbPassword) {
+            console.log("password issue")
             res.status(400).send("Passwords did not match!");
         } else {
             res.status(200).send("Login Validated");
@@ -58,6 +59,8 @@ app.get('/login',async (req, res) => {
 
 app.post('/register', async (req, res) => {
     const bodyData = req.body;
+    console.log("Attempting Register");
+    console.log(bodyData);
 
     try {
         const userRef = db.collection('users');
@@ -75,10 +78,12 @@ app.post('/register', async (req, res) => {
         }
         //Set the new data into the collection.
         await userRef.doc().set(userData);
+        console.log("set data");
 
         res.status(201).send("New user registered");
     } catch (error) {
-        res.status(500).send("err");
+        console.log("FAIL")
+        res.status(500).send(error);
     }
 })
 

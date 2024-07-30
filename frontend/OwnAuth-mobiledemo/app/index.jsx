@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Image,
@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, router, useRootNavigationState } from "expo-router";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,9 +22,27 @@ const Login = () => {
 
   const [fieldsFilled, setFieldsFilled] = useState(true);
 
-  function VerifyLogin() {
-    console.log("Nothing to show :(");
+  async function VerifyLogin() {
     //Send credentials to API for verification
+    try {
+        const response = await fetch('http://192.168.100.13:3000/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        })
+
+        if(response.ok) {
+            console.log("logged in");
+        }
+        console.log(response.status);
+    } catch (error) {
+        console.log(error);
+    }
 
     //Route to homepage if successful verification
 
@@ -68,9 +86,9 @@ const Login = () => {
                     setCredentials({ email: email, password: password });
                     console.log("Wawawa")
                     VerifyLogin();
+                  } else {
+                      setFieldsFilled(false);
                   }
-                  setFieldsFilled(false);
-                  console.log(credentials);
                 }}
               >
                 Login

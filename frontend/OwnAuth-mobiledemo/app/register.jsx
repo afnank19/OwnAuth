@@ -23,8 +23,28 @@ const Register = () => {
   const [credentials, setCredentials] = useState({});
 
     //Add the error text if fields not filled
-  function RegisterUser() {
+  const RegisterUser = async () => {
     //Send over credentials to API
+    try {
+        console.log(JSON.stringify(credentials) + "+]");
+
+        const response = await fetch('http://192.168.100.13:3000/register', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+        });
+
+        console.log("++++++ " + response);
+        
+    } catch (error) {
+        console.log(error)
+    }
 
     //if response OK then redirect to homepage
 
@@ -77,8 +97,6 @@ const Register = () => {
 
                     RegisterUser();
                   }
-
-                  console.log(credentials);
                 }}
               >
                 Register
