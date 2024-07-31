@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import { Link, router, useRootNavigationState } from "expo-router";
 
+//Test login credentials: admin, abc@mail.com, 123
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +40,7 @@ const Login = () => {
 
         if(response.ok) {
             console.log("logged in");
+            router.replace("/homepage");
         }
         console.log(response.status);
     } catch (error) {

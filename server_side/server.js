@@ -2,6 +2,7 @@ const express = require('express')
 const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
 
@@ -88,7 +89,7 @@ app.post('/register', async (req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Server up on port ${PORT}`)
+  console.log(`Server is running on port ${PORT} | url: http://localhost:3000`)
 })
 
 
@@ -102,3 +103,46 @@ function hashPassword(password, salt) {
     hash.update(password);
     return hash.digest('hex');
 }
+
+//Test code:
+const PRIVATE_KEY = 'malenia'
+
+app.post('/tokenTest', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    console.log(token);
+
+    
+    try {
+        //Verify the JWT, and check respones based on expiration
+        const decoded = jwt.verify(token, PRIVATE_KEY);
+
+        console.log(decoded);
+        
+        let data = { token: decoded.username};
+
+        res.status(200).send(data);
+    } catch (error) {
+        
+    }
+})
+
+app.post('/getToken', async (req, res) => {
+    const body = req.body;
+
+    try {
+
+        var testToken = jwt.sign({
+        username: body.user
+        }, PRIVATE_KEY, {expiresIn: '2min'})
+
+        console.log(testToken);
+
+        let data = { accessToken: testToken}
+
+        res.status(200).send(data);
+    } catch (error) {
+        
+    }
+})
