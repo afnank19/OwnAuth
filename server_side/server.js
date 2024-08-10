@@ -4,14 +4,11 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
+const PRIVATE_KEY = 'malenia' //Temporary, will be changed soon
+const REFRESH_KEY = 'melina'
 
-//Testing
-// const hash = crypto.createHash('sha256')
-// const data = 'afnank19';
-// hash.update(data);
-// const digest = hash.digest('hex');
-// console.log(digest);
+var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
+const { error } = require('console');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -40,6 +37,8 @@ app.post('/login',async (req, res) => {
         const dbPassword = queryRes.docs[0].data().password;
         const dbSalt = queryRes.docs[0].data().salt;
 
+        console.log(queryRes.docs[0].id);
+
         //validate user password
         let inputPassword = bodyData.password;
         let hashedPword =  hashPassword(inputPassword, dbSalt);
@@ -48,7 +47,13 @@ app.post('/login',async (req, res) => {
             console.log("password issue")
             res.status(400).send("Passwords did not match!");
         } else {
-            res.status(200).send("Login Validated");
+            //if password is valid
+            let tokenData = {
+                userID: queryRes.docs[0].id
+            }
+            let data = GenerateTokens(tokenData);
+
+            res.status(200).send(data);
         }
     } catch (error) {
         res.status(500).send("err");
@@ -78,13 +83,85 @@ app.post('/register', async (req, res) => {
             "salt": salt
         }
         //Set the new data into the collection.
-        await userRef.doc().set(userData);
-        console.log("set data");
+        const docRef = await userRef.add(userData);
+        console.log("set data with id: " + docRef.id);
 
-        res.status(201).send("New user registered");
+        //Create the token
+        let tokenData = {
+            userID: docRef.id
+        }
+        let data = GenerateTokens(tokenData);
+
+        //send the token for future requests
+        res.status(201).send(data);
     } catch (error) {
         console.log("FAIL")
         res.status(500).send(error);
+    }
+})
+
+app.get('/homepage', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    console.log(token);
+    
+    try {
+        const decoded = jwt.verify(token, PRIVATE_KEY);
+
+        // if(decoded == undefined) {
+        //     console.log("invalid token? expired perhaps!")
+        //     throw new error;
+        // }
+
+        console.log(decoded.userID);
+
+        const userRef = db.collection('users').doc(decoded.userID);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+            res.status(404).send("Not found");
+            return;
+        } else {
+            res.status(201).send(userDoc.data()); //this sends hashed passwords too, mush be changed
+            return;
+        }
+        
+    } catch (error) {
+        console.log(error);
+
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }        
+    }
+})
+
+app.get('/refresh', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+    console.log("Refresh: " + token);
+
+    try {
+        //Check if refresh token is expired
+        const decoded = jwt.verify(token, REFRESH_KEY)
+        tokenData = {
+            userID: decoded.userID 
+        }
+
+        let data = GenerateTokens(tokenData);
+        console.log("new tokens: " + data);
+
+        res.status(200).send(data)
+    } catch (error) {
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        } 
     }
 })
 
@@ -104,8 +181,19 @@ function hashPassword(password, salt) {
     return hash.digest('hex');
 }
 
+function GenerateTokens(tokenData) {
+    var accessToken = jwt.sign(tokenData, PRIVATE_KEY, {expiresIn: '1min'});
+    var refreshToken = jwt.sign(tokenData, REFRESH_KEY, {expiresIn: '10min'});
+
+    let data = {
+        accessToken: accessToken,
+        refreshToken: refreshToken
+    }
+
+    return data;
+}
+
 //Test code:
-const PRIVATE_KEY = 'malenia'
 
 app.post('/tokenTest', async (req, res) => {
     const bearerHeader = req.headers.authorization;
@@ -135,7 +223,7 @@ app.post('/getToken', async (req, res) => {
 
         var testToken = jwt.sign({
         username: body.user
-        }, PRIVATE_KEY, {expiresIn: '2min'})
+        }, PRIVATE_KEY, {expiresIn: '1d'})
 
         console.log(testToken);
 

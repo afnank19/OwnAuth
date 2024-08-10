@@ -14,99 +14,145 @@ import {
   StatusBar,
 } from "react-native";
 import { Link, router, useRootNavigationState } from "expo-router";
-
+import * as SecureStore from "expo-secure-store";
+import { RefreshResolve } from "./auth";
 //Test login credentials: admin, abc@mail.com, 123
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [credentials, setCredentials] = useState({});
-
   const [fieldsFilled, setFieldsFilled] = useState(true);
+  const [displayLogin, setDisplayLogin] = useState(false);
 
   async function VerifyLogin() {
     //Send credentials to API for verification
     try {
-        const response = await fetch('http://192.168.100.13:3000/login', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        })
+      const response = await fetch("http://192.168.100.13:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
-        if(response.ok) {
-            console.log("logged in");
-            router.replace("/homepage");
-        }
-        console.log(response.status);
+      const data = await response.json();
+      //Route to homepage if successful verification
+      if (response.ok) {
+        console.log("logged in");
+        SetAccessToken(data.accessToken);
+        SetRefreshToken(data.refreshToken);
+        router.replace("/homepage");
+      }
+      console.log(response.status);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
 
-    //Route to homepage if successful verification
+    async function SetAccessToken(accessToken) {
+      let key = "accessToken";
+      await SecureStore.setItemAsync(key, accessToken);
+    }
+    async function SetRefreshToken(refreshToken) {
+      let refreshKey = "refreshToken";
+      await SecureStore.setItemAsync(refreshKey, refreshToken);
+    }
 
     //Handle Sessions
   }
 
+  async function CheckSession() {
+    try {
+      let sessionValid = false;
+      sessionValid = await RefreshResolve();
+
+      if (sessionValid == true) {
+        //Move to the homepage
+        router.replace("/homepage");
+      } else if (sessionValid == false) {
+        setDisplayLogin(true);
+      }
+    } catch (error) {
+        console.log(error);
+        setDisplayLogin(true);
+    }
+  }
+
+  useState(() => {
+    CheckSession();
+  }, [])
+
+  //testing function
+  function moveToHomePage() {
+    router.replace("/homepage");
+  }
+
   return (
     <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <StatusBar barStyle="dark-content" />
+      {displayLogin ? (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
-          </View>
-          <KeyboardAvoidingView
-            style={styles.inputContainer}
-            behavior="padding"
-          >
-            {fieldsFilled ? null : <Text style={styles.errorText}>Please fill out all the fields</Text> }
-            <Text style={styles.inputText}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              onChangeText={setEmail}
-              value={email}
-            />
-            <Text style={styles.inputText}>Password</Text>
-            <TextInput
-            secureTextEntry={true}
-              style={styles.input}
-              placeholder="Password"
-              onChangeText={setPassword}
-              value={password}
-            />
-            <TouchableOpacity style={styles.inputButton}>
-              <Text
-                style={styles.buttonText}
-                onPress={() => {
-                  if (email != "" && password != "") {
-                    setFieldsFilled(true);
-                    setCredentials({ email: email, password: password });
-                    console.log("Wawawa")
-                    VerifyLogin();
-                  } else {
+            <StatusBar barStyle="dark-content" />
+            <View style={styles.container}>
+              <Text style={styles.title}>Login</Text>
+            </View>
+            <KeyboardAvoidingView
+              style={styles.inputContainer}
+              behavior="padding"
+            >
+              {fieldsFilled ? null : (
+                <Text style={styles.errorText}>
+                  Please fill out all the fields
+                </Text>
+              )}
+              <Text style={styles.inputText}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                onChangeText={setEmail}
+                value={email}
+              />
+              <Text style={styles.inputText}>Password</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={styles.input}
+                placeholder="Password"
+                onChangeText={setPassword}
+                value={password}
+              />
+              <TouchableOpacity style={styles.inputButton}>
+                <Text
+                  style={styles.buttonText}
+                  onPress={() => {
+                    if (email != "" && password != "") {
+                      setFieldsFilled(true);
+                      setCredentials({ email: email, password: password });
+                      console.log("Wawawa");
+                      VerifyLogin();
+                      //moveToHomePage();
+                    } else {
                       setFieldsFilled(false);
-                  }
-                }}
-              >
-                Login
+                    }
+                  }}
+                >
+                  Login
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.registerText}>
+                New to BadTwitter?{" "}
+                <Link href="/register" style={styles.registerLink}>
+                  Register
+                </Link>
               </Text>
-            </TouchableOpacity>
-            <Text style={styles.registerText}>
-              New to BadTwitter?{" "}
-              <Link href="/register" style={styles.registerLink}>
-                Register
-              </Link>
-            </Text>
-            
-          </KeyboardAvoidingView>
-        </View>
-      </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+          </View>
+        </TouchableWithoutFeedback>
+      ) : (
+        <Text style={styles.title}>Launching App</Text>
+      )}
     </>
   );
 };
@@ -168,6 +214,6 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: "red",
-    padding: 10
-  }
+    padding: 10,
+  },
 });

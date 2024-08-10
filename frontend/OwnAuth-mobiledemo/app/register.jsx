@@ -13,7 +13,8 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -40,12 +41,27 @@ const Register = () => {
             })
         });
 
-        console.log("++++++ " + response);
+        const data = await response.json();
+
+        if(response.ok) {
+            console.log("registered with token => " + data.accessToken);
+            SetAccessToken(data.accessToken);
+            SetRefreshToken(data.refreshToken);
+            router.replace('/homepage');
+        }
         
     } catch (error) {
         console.log(error)
     }
 
+    async function SetAccessToken(accessToken) {
+        let key = 'accessToken'
+        await SecureStore.setItemAsync(key , accessToken);
+    }
+    async function  SetRefreshToken(refreshToken) {
+        let refreshKey = 'refreshToken';
+        await SecureStore.setItemAsync(refreshKey, refreshToken);
+    }  
     //if response OK then redirect to homepage
 
     //if response BAD then show error
