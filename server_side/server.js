@@ -182,8 +182,8 @@ function hashPassword(password, salt) {
 }
 
 function GenerateTokens(tokenData) {
-    var accessToken = jwt.sign(tokenData, PRIVATE_KEY, {expiresIn: '1min'});
-    var refreshToken = jwt.sign(tokenData, REFRESH_KEY, {expiresIn: '10min'});
+    var accessToken = jwt.sign(tokenData, PRIVATE_KEY, {expiresIn: '15min'});
+    var refreshToken = jwt.sign(tokenData, REFRESH_KEY, {expiresIn: '10d'});
 
     let data = {
         accessToken: accessToken,
