@@ -1,14 +1,16 @@
+const dotenv = require('dotenv');
 const express = require('express')
 const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-const PRIVATE_KEY = 'malenia' //Temporary, will be changed soon
-const REFRESH_KEY = 'melina'
+dotenv.config();
+
+//console.log(process.env.PRIVATE_KEY);
 
 var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
-const { error } = require('console');
+//const { error } = require('console');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -107,7 +109,7 @@ app.get('/homepage', async (req, res) => {
     console.log(token);
     
     try {
-        const decoded = jwt.verify(token, PRIVATE_KEY);
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
 
         // if(decoded == undefined) {
         //     console.log("invalid token? expired perhaps!")
@@ -146,7 +148,7 @@ app.get('/refresh', async (req, res) => {
 
     try {
         //Check if refresh token is expired
-        const decoded = jwt.verify(token, REFRESH_KEY)
+        const decoded = jwt.verify(token, process.env.REFRESH_KEY)
         tokenData = {
             userID: decoded.userID 
         }
@@ -182,8 +184,8 @@ function hashPassword(password, salt) {
 }
 
 function GenerateTokens(tokenData) {
-    var accessToken = jwt.sign(tokenData, PRIVATE_KEY, {expiresIn: '15min'});
-    var refreshToken = jwt.sign(tokenData, REFRESH_KEY, {expiresIn: '10d'});
+    var accessToken = jwt.sign(tokenData, process.env.PRIVATE_KEY, {expiresIn: '15min'});
+    var refreshToken = jwt.sign(tokenData, process.env.REFRESH_KEY, {expiresIn: '10d'});
 
     let data = {
         accessToken: accessToken,
@@ -204,7 +206,7 @@ app.post('/tokenTest', async (req, res) => {
     
     try {
         //Verify the JWT, and check respones based on expiration
-        const decoded = jwt.verify(token, PRIVATE_KEY);
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
 
         console.log(decoded);
         
@@ -223,7 +225,7 @@ app.post('/getToken', async (req, res) => {
 
         var testToken = jwt.sign({
         username: body.user
-        }, PRIVATE_KEY, {expiresIn: '1d'})
+        }, process.env.PRIVATE_KEY, {expiresIn: '10min'})
 
         console.log(testToken);
 

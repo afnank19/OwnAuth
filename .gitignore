@@ -1,2 +1,3 @@
 server_side/node_modules
 server_side/secret
+server_side/.env
