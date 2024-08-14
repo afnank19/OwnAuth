@@ -1,4 +1,4 @@
-import { View, Text, StatusBar } from 'react-native'
+import { View, Text, StatusBar, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -48,5 +48,9 @@ const Homepage = () => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+    
+})
 
 export default Homepage;

@@ -10,6 +10,7 @@ dotenv.config();
 //console.log(process.env.PRIVATE_KEY);
 
 var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
+const { timeStamp } = require('console');
 //const { error } = require('console');
 
 admin.initializeApp({
@@ -141,6 +142,124 @@ app.get('/homepage', async (req, res) => {
     }
 })
 
+app.get('/user/tweets', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    try {
+        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+
+        const followingSnapshot = await admin.firestore().collection('users').doc('KPH3P3bkjU7bZT4GjBq3').collection('following').get();
+        const followingUsers = followingSnapshot.docs.map(doc => doc.data());
+
+        const tweetsPromises = followingUsers.map(async user => {
+            const tweetsSnapshot = await admin.firestore().collection('tweets').where('username', '==', user.username).get();
+            return tweetsSnapshot.docs.map(doc => doc.data());
+        });
+      
+        const tweets = await Promise.all(tweetsPromises);
+
+        res.status(200).json(tweets);
+
+    } catch (error) {
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
+app.get('/user/search/:username', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    const username = req.params.username;
+
+    try {
+        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+
+        const usersSnapshot = await admin.firestore().collection('users')
+        .where('username', '>=', username)
+        .where('username', '<', username + '\uf8ff') // Inclusive search for usernames starting with 'username'
+        .get();
+
+        const users = usersSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+        res.json(users);
+    } catch (error) {
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
+app.post('/user/tweet', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    const bodyData = req.body;
+
+    try {
+        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+
+        const tweet = {
+            body: bodyData.body,
+            username: bodyData.username,
+            timeStamp: getCurrentTimeAndDate()
+        }
+
+        await admin.firestore().collection('tweets').add(tweet);
+
+        res.status(201).json({status: 1});
+    } catch (error) {
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
+app.post('/user/follower/:username', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    const requesterUsername = req.params.username;
+    const bodyData = req.body;
+
+    try {
+        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+
+        await admin.firestore().collection('users').doc('KPH3P3bkjU7bZT4GjBq3').collection('following').doc().set({
+            userID: bodyData.userID,
+            username: bodyData.username
+        });
+
+        await admin.firestore().collection('users').doc(bodyData.userID).collection('followers').doc().set({
+            userID: "KPH3P3bkjU7bZT4GjBq3",
+            username: requesterUsername
+        })
+
+        res.status(201).json({status: 1});
+    } catch (error) {
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
 app.get('/refresh', async (req, res) => {
     const bearerHeader = req.headers.authorization;
     const token = bearerHeader.split(' ')[1];
@@ -194,6 +313,18 @@ function GenerateTokens(tokenData) {
 
     return data;
 }
+function getCurrentTimeAndDate() {
+    const now = new Date();
+  
+    // Format the time and date
+    const options = { hour: 'numeric', minute: '2-digit' };
+    const timeString = now.toLocaleTimeString('en-US', options);
+  
+    const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    const dateString = now.toLocaleDateString('en-US', dateOptions);
+  
+    return `${timeString} ${dateString}`;
+  }
 
 //Test code:
 
