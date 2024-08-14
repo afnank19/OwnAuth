@@ -2,7 +2,8 @@ import { View, Text, StatusBar, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RefreshResolve } from './auth';
+import { RefreshResolve } from '../auth';
+import Tweet from '../../components/tweet';
 
 const Homepage = () => {
     [username, setUsername] = useState('Loading..');
@@ -37,20 +38,55 @@ const Homepage = () => {
             console.log(error);
         }
     }
-    useEffect(() => {
-        fetchUser();
-    },[])
+    // useEffect(() => {
+    //     fetchUser();
+    // },[])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
-      <Text>Welcome {username} work plsssssssss.....</Text>
+        <Text style={styles.title}>BadTwitter</Text>
+        <Text>Welcome {username} work plsssssssss.....</Text>
+
+        <Tweet />
+        <Tweet />
+
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-    
+    title: {
+        fontSize: 36,
+        fontWeight: "bold",
+    },
+    container: {
+        flex: 1,
+        flexDirection: "column",
+        padding: 20,
+        backgroundColor: '#f7f7f8',
+    },
+    tweetContainer: {
+        backgroundColor: '#e3e3e8',
+        padding: 10,
+        borderRadius: 16,
+        marginVertical: 7
+    },
+    tweetTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 3
+    },
+    tweetBody: {
+        fontSize: 16,
+        fontWeight: '400',
+        marginBottom: 8
+    },
+    tweetDate: {
+        fontSize: 14,
+        fontWeight: '300',
+        color: '#554c67'
+    }
 })
 
 export default Homepage;

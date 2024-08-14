@@ -10,9 +10,9 @@ const RootLayout = () => {
         <Stack.Screen name='register' options={{
             headerShown: false
         }}/>
-        <Stack.Screen name='homepage' options={{
-            headerShown: false,
-        }}/>
+        <Stack.Screen name='(tabs)' options={{
+            headerShown: false
+        }} />
     </Stack>
   )
 }
