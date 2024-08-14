@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const Tweet = () => {
+const Tweet = (props) => {
   return (
     <View style={styles.tweetContainer}>
-            <Text style={styles.tweetTitle}>@afnank19</Text>
-            <Text style={styles.tweetBody}>Javascript se bakwaas tareen cheez aaj tak nhi dekhi</Text>
-            <Text style={styles.tweetDate}>5:54 PM August 14, 2024</Text>
+            <Text style={styles.tweetTitle}>@{props.username}</Text>
+            <Text style={styles.tweetBody}>{props.body}</Text>
+            <Text style={styles.tweetDate}>{props.timestamp}</Text>
     </View>
   )
 }

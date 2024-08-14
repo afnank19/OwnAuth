@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet } from 'react-native'
+import { View, Text, StatusBar, StyleSheet, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +6,8 @@ import { RefreshResolve } from '../auth';
 import Tweet from '../../components/tweet';
 
 const Homepage = () => {
-    [username, setUsername] = useState('Loading..');
+    const [username, setUsername] = useState('Loading..');
+    const [tweets, setTweets] = useState(null);
 
     async function fetchUser() {
         try {
@@ -38,18 +39,59 @@ const Homepage = () => {
             console.log(error);
         }
     }
-    // useEffect(() => {
-    //     fetchUser();
-    // },[])
+
+    async function getTweets() {
+        try {
+            const accessToken = await SecureStore.getItemAsync('accessToken');
+
+            console.log("fetching tweets");
+            const response = await fetch('http://192.168.100.13:3000/user/tweets', {
+                method: "GET",
+                headers: {
+                    'Authorization' : 'Bearer ' + accessToken
+                }
+            });
+
+            const data = await response.json();
+            if(response.ok) {
+                console.log(data[0]);
+                setTweets(data[0]);
+            }
+            if (response.status == "401"){
+                console.log("Access Token Expired, fetching new token!")
+                let areTokensSet = false
+                areTokensSet = await RefreshResolve();
+                if (areTokensSet == true) {
+                    getTweets();
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    useEffect(() => {
+        getTweets();
+    },[])
 
   return (
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <Text style={styles.title}>BadTwitter</Text>
-        <Text>Welcome {username} work plsssssssss.....</Text>
+        <Text>Welcome {username} work plssssssssssssss.....</Text>
 
-        <Tweet />
-        <Tweet />
+        {/* <Tweet username={tweets[0].username} body={tweets[0].body} timestamp={tweets[0].timeStamp}/>
+        <Tweet username={tweets[1].username} body={tweets[1].body}/> */}
+        
+            {tweets? (
+                <ScrollView>
+                {tweets.map((tweet, index) => (
+                    <Tweet key={index} username={tweet.username} body={tweet.body} timestamp={tweet.timeStamp}/>
+                ))}
+                </ScrollView>
+            ) : (
+                <Text style={styles.title}>Loading...</Text>
+            )}
+        
 
     </SafeAreaView>
   )

@@ -147,9 +147,10 @@ app.get('/user/tweets', async (req, res) => {
     const token = bearerHeader.split(' ')[1];
 
     try {
-        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+        console.log("trying to get tweets");
 
-        const followingSnapshot = await admin.firestore().collection('users').doc('KPH3P3bkjU7bZT4GjBq3').collection('following').get();
+        const followingSnapshot = await admin.firestore().collection('users').doc(decoded.userID).collection('following').get();
         const followingUsers = followingSnapshot.docs.map(doc => doc.data());
 
         const tweetsPromises = followingUsers.map(async user => {
@@ -185,12 +186,19 @@ app.get('/user/search/:username', async (req, res) => {
         .where('username', '<', username + '\uf8ff') // Inclusive search for usernames starting with 'username'
         .get();
 
+        const followingSnapshot = await admin.firestore().collection('users').doc("KPH3P3bkjU7bZT4GjBq3").collection('following').get();
+        const followingUsers = followingSnapshot.docs.map(doc => doc.data());
+        console.log(followingUsers);
+
         const users = usersSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-          }));
+        }));
 
-        res.json(users);
+        const result = checkFollowedUsers(users, followingUsers)
+
+
+        res.json(result);
     } catch (error) {
         if(error.name === 'TokenExpiredError') {
             console.log("expired token")
@@ -324,6 +332,16 @@ function getCurrentTimeAndDate() {
     const dateString = now.toLocaleDateString('en-US', dateOptions);
   
     return `${timeString} ${dateString}`;
+  }
+
+  function checkFollowedUsers(users, followingUsers) {
+    const followingUsernames = followingUsers.map(user => user.username); // Extract user IDs from followingUsers
+  
+    console.log(followingUsernames);
+    return users.map(user => ({
+      ...user,
+      isFollowed: followingUsernames.includes(user.username)
+    }));
   }
 
 //Test code:
