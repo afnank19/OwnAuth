@@ -158,12 +158,12 @@ app.get('/user/tweets', async (req, res) => {
         const usernames = followingUsers.map(user => user.username);
         console.log(usernames);
 
-        const tweetsPromises = followingUsers.map(async user => {
-            const tweetsSnapshot = await admin.firestore().collection('tweets').where('username', '==', user.username).get();
-            return tweetsSnapshot.docs.map(doc => doc.data());
-        });
+        // const tweetsPromises = followingUsers.map(async user => {
+        //     const tweetsSnapshot = await admin.firestore().collection('tweets').where('username', '==', user.username).get();
+        //     return tweetsSnapshot.docs.map(doc => doc.data());
+        // });
       
-        const tweets = await Promise.all(tweetsPromises);
+        // const tweets = await Promise.all(tweetsPromises);
         //console.log(tweets);
 
         const twitSnapshot = await admin.firestore().collection('tweets').where('username', "in", usernames).orderBy('createdAt', 'desc').get();
