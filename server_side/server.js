@@ -122,11 +122,14 @@ app.get('/homepage', async (req, res) => {
         const userRef = db.collection('users').doc(decoded.userID);
         const userDoc = await userRef.get();
 
+        const data = userDoc.data();
+        const result = {username: data.username}
+
         if (!userDoc.exists) {
             res.status(404).send("Not found");
             return;
         } else {
-            res.status(201).send(userDoc.data()); //this sends hashed passwords too, mush be changed
+            res.status(201).send(result); //this sends hashed passwords too, mush be changed
             return;
         }
         
@@ -152,6 +155,8 @@ app.get('/user/tweets', async (req, res) => {
 
         const followingSnapshot = await admin.firestore().collection('users').doc(decoded.userID).collection('following').get();
         const followingUsers = followingSnapshot.docs.map(doc => doc.data());
+        const usernames = followingUsers.map(user => user.username);
+        console.log(usernames);
 
         const tweetsPromises = followingUsers.map(async user => {
             const tweetsSnapshot = await admin.firestore().collection('tweets').where('username', '==', user.username).get();
@@ -159,10 +164,16 @@ app.get('/user/tweets', async (req, res) => {
         });
       
         const tweets = await Promise.all(tweetsPromises);
+        //console.log(tweets);
 
-        res.status(200).json(tweets);
+        const twitSnapshot = await admin.firestore().collection('tweets').where('username', "in", usernames).orderBy('createdAt', 'desc').get();
+        const twitData = twitSnapshot.docs.map(doc => doc.data());
+        console.log(twitData);
+
+        res.status(200).json(twitData);
 
     } catch (error) {
+        console.log(error);
         if(error.name === 'TokenExpiredError') {
             console.log("expired token")
             res.status(401).send(error);
@@ -178,21 +189,22 @@ app.get('/user/search/:username', async (req, res) => {
 
     const username = req.params.username;
 
+    console.log("searching");
     try {
-        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY)
 
         const usersSnapshot = await admin.firestore().collection('users')
         .where('username', '>=', username)
         .where('username', '<', username + '\uf8ff') // Inclusive search for usernames starting with 'username'
         .get();
 
-        const followingSnapshot = await admin.firestore().collection('users').doc("KPH3P3bkjU7bZT4GjBq3").collection('following').get();
+        const followingSnapshot = await admin.firestore().collection('users').doc(decoded.userID).collection('following').get();
         const followingUsers = followingSnapshot.docs.map(doc => doc.data());
         console.log(followingUsers);
 
         const users = usersSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
+            userID: doc.id,
+            username: doc.data().username
         }));
 
         const result = checkFollowedUsers(users, followingUsers)
@@ -200,6 +212,7 @@ app.get('/user/search/:username', async (req, res) => {
 
         res.json(result);
     } catch (error) {
+        console.log(error);
         if(error.name === 'TokenExpiredError') {
             console.log("expired token")
             res.status(401).send(error);
@@ -221,7 +234,8 @@ app.post('/user/tweet', async (req, res) => {
         const tweet = {
             body: bodyData.body,
             username: bodyData.username,
-            timeStamp: getCurrentTimeAndDate()
+            timeStamp: getCurrentTimeAndDate(),
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
         }
 
         await admin.firestore().collection('tweets').add(tweet);
@@ -244,21 +258,26 @@ app.post('/user/follower/:username', async (req, res) => {
     const requesterUsername = req.params.username;
     const bodyData = req.body;
 
-    try {
-        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+    console.log(bodyData);
+    console.log(requesterUsername);
 
-        await admin.firestore().collection('users').doc('KPH3P3bkjU7bZT4GjBq3').collection('following').doc().set({
+    try {
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY)
+        console.log(decoded.userID);
+
+        await admin.firestore().collection('users').doc(decoded.userID).collection('following').doc().set({
             userID: bodyData.userID,
             username: bodyData.username
         });
 
         await admin.firestore().collection('users').doc(bodyData.userID).collection('followers').doc().set({
-            userID: "KPH3P3bkjU7bZT4GjBq3",
+            userID: decoded.userID,
             username: requesterUsername
         })
 
         res.status(201).json({status: 1});
     } catch (error) {
+        console.log(error)
         if(error.name === 'TokenExpiredError') {
             console.log("expired token")
             res.status(401).send(error);
@@ -271,7 +290,6 @@ app.post('/user/follower/:username', async (req, res) => {
 app.get('/refresh', async (req, res) => {
     const bearerHeader = req.headers.authorization;
     const token = bearerHeader.split(' ')[1];
-    console.log("Refresh: " + token);
 
     try {
         //Check if refresh token is expired
@@ -281,7 +299,6 @@ app.get('/refresh', async (req, res) => {
         }
 
         let data = GenerateTokens(tokenData);
-        console.log("new tokens: " + data);
 
         res.status(200).send(data)
     } catch (error) {

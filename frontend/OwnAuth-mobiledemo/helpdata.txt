@@ -4,3 +4,11 @@
 --primary: #7d7290;
 --secondary: #b0a8bf;
 --accent: #9f93b6;
+
+
+BUGS:
+Fix search loader even when not searching,
+Fix all styles
+Fix NULL types
+Fix Icons
+Fix Tab Bar

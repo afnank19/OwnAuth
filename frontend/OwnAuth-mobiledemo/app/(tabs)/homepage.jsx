@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,9 +22,10 @@ const Homepage = () => {
 
             const data = await response.json();
             if (response.ok) {
-                console.log(data);
+                console.log(data.username);
 
-                setUsername(data.username);
+                //setUsername(data.username);
+                await SecureStore.setItemAsync('username', data.username)
             }
             if (response.status == "401") {
                 //const refreshToken = await SecureStore.getItemAsync('refreshToken');
@@ -51,11 +52,12 @@ const Homepage = () => {
                     'Authorization' : 'Bearer ' + accessToken
                 }
             });
-
+            
+            console.log(response.status);
             const data = await response.json();
             if(response.ok) {
-                console.log(data[0]);
-                setTweets(data[0]);
+                console.log(data);
+                setTweets(data);
             }
             if (response.status == "401"){
                 console.log("Access Token Expired, fetching new token!")
@@ -70,6 +72,7 @@ const Homepage = () => {
         }
     }
     useEffect(() => {
+        fetchUser();
         getTweets();
     },[])
 
@@ -77,7 +80,7 @@ const Homepage = () => {
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <Text style={styles.title}>BadTwitter</Text>
-        <Text>Welcome {username} work plssssssssssssss.....</Text>
+        <Text>Welcome {username} work plsssssssssssssssssssss</Text>
 
         {/* <Tweet username={tweets[0].username} body={tweets[0].body} timestamp={tweets[0].timeStamp}/>
         <Tweet username={tweets[1].username} body={tweets[1].body}/> */}
@@ -89,7 +92,7 @@ const Homepage = () => {
                 ))}
                 </ScrollView>
             ) : (
-                <Text style={styles.title}>Loading...</Text>
+                <ActivityIndicator />
             )}
         
 

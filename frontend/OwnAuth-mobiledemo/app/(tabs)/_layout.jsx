@@ -9,6 +9,9 @@ export default () => {
             <Tabs.Screen name='search' options={{
                 headerShown: false
             }} />
+            <Tabs.Screen name='post' options={{
+                headerShown: false
+            }} />
         </Tabs>
     )
 }
