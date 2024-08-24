@@ -15,15 +15,17 @@ export default Tweet
 
 const styles = StyleSheet.create({
     tweetContainer: {
-        backgroundColor: '#e3e3e8',
+        backgroundColor: '#f2f5ef', //f7f2ed
         padding: 10,
         borderRadius: 16,
-        marginVertical: 7
+        marginVertical: 6,
+        marginHorizontal: 7,
     },
     tweetTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 3
+        marginBottom: 3,
+        color: "#3b4323"
     },
     tweetBody: {
         fontSize: 16,

@@ -86,7 +86,7 @@ export default UserPill;
 
 const styles = StyleSheet.create({
   userContainer: {
-    backgroundColor: "#e3e3e8",
+    backgroundColor: "#e6ecdf",
     textAlign: "left",
     flexDirection: "row",
     padding: 10,
@@ -99,9 +99,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 3,
+    color: "#3b4323"
   },
   followBtn: {
-    backgroundColor: "#7d7290",
+    backgroundColor: "#5d7029",
     color: "#fff",
     padding: 7,
     paddingHorizontal: 12,

@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import Tweet from '../../components/tweet';
 const Homepage = () => {
     const [username, setUsername] = useState('Loading..');
     const [tweets, setTweets] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     async function fetchUser() {
         try {
@@ -44,12 +45,15 @@ const Homepage = () => {
     async function getTweets() {
         try {
             const accessToken = await SecureStore.getItemAsync('accessToken');
+            const username = await SecureStore.getItemAsync('username');
+            console.log(username);
 
             console.log("fetching tweets");
             const response = await fetch('http://192.168.100.13:3000/user/tweets', {
                 method: "GET",
                 headers: {
-                    'Authorization' : 'Bearer ' + accessToken
+                    'Authorization' : 'Bearer ' + accessToken,
+                    'Username' : username
                 }
             });
             
@@ -71,6 +75,24 @@ const Homepage = () => {
             console.log(error);
         }
     }
+
+    const onRefresh = async() => {
+        setRefreshing(true);
+        getTweets();
+        
+        try {
+            await getTweets();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setRefreshing(false);
+        }
+        // setTimeout(() => {
+        //     console.log('Function called on pull down');
+        //     setRefreshing(false);
+        // }, 2000);
+    }
+
     useEffect(() => {
         fetchUser();
         getTweets();
@@ -79,14 +101,12 @@ const Homepage = () => {
   return (
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
-        <Text style={styles.title}>BadTwitter</Text>
-        <Text>Welcome {username} work plsssssssssssssssssssss</Text>
-
+        <Text style={styles.title}>Qwitter</Text>
         {/* <Tweet username={tweets[0].username} body={tweets[0].body} timestamp={tweets[0].timeStamp}/>
         <Tweet username={tweets[1].username} body={tweets[1].body}/> */}
         
             {tweets? (
-                <ScrollView>
+                <ScrollView style={styles.scrollView}  refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
                 {tweets.map((tweet, index) => (
                     <Tweet key={index} username={tweet.username} body={tweet.body} timestamp={tweet.timeStamp}/>
                 ))}
@@ -103,35 +123,42 @@ const Homepage = () => {
 const styles = StyleSheet.create({
     title: {
         fontSize: 36,
-        fontWeight: "bold",
+        fontWeight: "400",
+        marginBottom: 30,
+        textAlign: "center",
+        color: "#3b4323",
     },
     container: {
         flex: 1,
         flexDirection: "column",
         padding: 20,
-        backgroundColor: '#f7f7f8',
+        backgroundColor: '#f4f5f2', //e2cdb6
     },
-    tweetContainer: {
-        backgroundColor: '#e3e3e8',
-        padding: 10,
-        borderRadius: 16,
-        marginVertical: 7
+    scrollView: {
+        backgroundColor: '#e6ecdf',
+        borderRadius: 16
     },
-    tweetTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 3
-    },
-    tweetBody: {
-        fontSize: 16,
-        fontWeight: '400',
-        marginBottom: 8
-    },
-    tweetDate: {
-        fontSize: 14,
-        fontWeight: '300',
-        color: '#554c67'
-    }
+    // tweetContainer: {
+    //     backgroundColor: '#fff',
+    //     padding: 10,
+    //     borderRadius: 16,
+    //     marginVertical: 7
+    // },
+    // tweetTitle: {
+    //     fontSize: 16,
+    //     fontWeight: 'bold',
+    //     marginBottom: 3
+    // },
+    // tweetBody: {
+    //     fontSize: 16,
+    //     fontWeight: '400',
+    //     marginBottom: 8
+    // },
+    // tweetDate: {
+    //     fontSize: 14,
+    //     fontWeight: '300',
+    //     color: '#554c67'
+    // }
 })
 
 export default Homepage;

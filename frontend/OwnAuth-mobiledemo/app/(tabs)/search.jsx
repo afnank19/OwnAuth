@@ -66,7 +66,9 @@ const Search = () => {
                     ))
                     ) : (
                         <View style={styles.loader}> 
-                            <ActivityIndicator />
+                            {searched != null && searched != ""? (
+                                <ActivityIndicator />
+                            ) : null}
                         </View>
                     )}
                 </ScrollView>
@@ -81,24 +83,26 @@ export default Search
 const styles = StyleSheet.create({
     title: {
         fontSize: 28,
-        fontWeight: "bold",
-        textAlign: "center"
+        fontWeight: "400",
+        textAlign: "center",
+        color: "#3b4323",
     },
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f7f7f8',
+        backgroundColor: '#f4f5f2',
         alignItems: "center",
     },
     input: {
         height: 50,
         width: 320,
         margin: 10,
-        borderWidth: 1,
+        borderWidth: 2,
+        borderColor: "#becb9a",
         borderRadius: 16,
         padding: 10,
         color: '#050506',
-        alignSelf: "center"
+        alignSelf: "center",
     },
     userContainer: {
         backgroundColor: '#e3e3e8',
@@ -126,6 +130,7 @@ const styles = StyleSheet.create({
         color: "#fff",
     },
     loader: {
+        display: "flex",
         flex: 1,
         justifyContent: "center",
         flexDirection: "column"

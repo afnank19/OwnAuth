@@ -148,6 +148,9 @@ app.get('/homepage', async (req, res) => {
 app.get('/user/tweets', async (req, res) => {
     const bearerHeader = req.headers.authorization;
     const token = bearerHeader.split(' ')[1];
+    const superUsername = req.headers.username;
+
+    console.log(superUsername)
 
     try {
         const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
@@ -156,6 +159,7 @@ app.get('/user/tweets', async (req, res) => {
         const followingSnapshot = await admin.firestore().collection('users').doc(decoded.userID).collection('following').get();
         const followingUsers = followingSnapshot.docs.map(doc => doc.data());
         const usernames = followingUsers.map(user => user.username);
+        usernames.push(superUsername);
         console.log(usernames);
 
         // const tweetsPromises = followingUsers.map(async user => {
@@ -228,8 +232,10 @@ app.post('/user/tweet', async (req, res) => {
 
     const bodyData = req.body;
 
+    console.log(bodyData);
+
     try {
-        //const decoded = jwt.verify(token, process.env.REFRESH_KEY)
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY)
 
         const tweet = {
             body: bodyData.body,
@@ -242,6 +248,7 @@ app.post('/user/tweet', async (req, res) => {
 
         res.status(201).json({status: 1});
     } catch (error) {
+        console.log(error)
         if(error.name === 'TokenExpiredError') {
             console.log("expired token")
             res.status(401).send(error);
