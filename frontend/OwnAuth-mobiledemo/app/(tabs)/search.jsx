@@ -56,8 +56,8 @@ const Search = () => {
   return (
     <SafeAreaView style={styles.container}>
 
-            <View>
                 <Text style={styles.title}>Search</Text>
+            <View>
                 <TextInput style={styles.input} placeholder='Search' onChangeText={setSearched} value={searched} />
                 <ScrollView keyboardShouldPersistTaps="handled">
                 {result? (

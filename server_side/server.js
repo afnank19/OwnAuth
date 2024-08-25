@@ -272,17 +272,44 @@ app.post('/user/follower/:username', async (req, res) => {
         const decoded = jwt.verify(token, process.env.PRIVATE_KEY)
         console.log(decoded.userID);
 
-        await admin.firestore().collection('users').doc(decoded.userID).collection('following').doc().set({
+        await admin.firestore().collection('users').doc(decoded.userID).collection('following').doc(bodyData.userID).set({
             userID: bodyData.userID,
             username: bodyData.username
         });
 
-        await admin.firestore().collection('users').doc(bodyData.userID).collection('followers').doc().set({
+        await admin.firestore().collection('users').doc(bodyData.userID).collection('followers').doc(decoded.userID).set({
             userID: decoded.userID,
             username: requesterUsername
         })
 
         res.status(201).json({status: 1});
+    } catch (error) {
+        console.log(error)
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
+app.delete('/user/follower/:username', async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    const requesterUsername = req.params.username;
+    const bodyData = req.body;
+
+    console.log("Unfollowing")
+    try {
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+
+        await admin.firestore().collection('users').doc(decoded.userID).collection('following').doc(bodyData.userID).delete();
+        await admin.firestore().collection('users').doc(bodyData.userID).collection('followers').doc(decoded.userID).delete();
+
+        res.status(204).json({status: 1})
+        
     } catch (error) {
         console.log(error)
         if(error.name === 'TokenExpiredError') {

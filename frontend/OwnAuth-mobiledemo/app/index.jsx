@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router, useRootNavigationState } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { RefreshResolve } from "./auth";
@@ -151,7 +152,14 @@ const Login = () => {
           </View>
         </TouchableWithoutFeedback>
       ) : (
-        <Text style={styles.title}>Launching App</Text>
+        <View style={styles.launcher}>
+          <Ionicons name='logo-nodejs' size={46} color='#93a857' />
+          <View style={styles.iconContainter}>
+            <Text>Powered by </Text>
+            <Ionicons name='logo-google' size={18} color='#4285F4' />
+            <Ionicons name='logo-firebase' size={18} color='#F4B400' />
+          </View>
+        </View>
       )}
     </>
   );
@@ -216,4 +224,14 @@ const styles = StyleSheet.create({
     color: "red",
     padding: 10,
   },
+  launcher: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20
+  },
+  iconContainter: {
+    flexDirection: "row",
+    gap: 5
+  }
 });

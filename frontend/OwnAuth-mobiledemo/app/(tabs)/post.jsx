@@ -6,6 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 const Post = () => {
     const [wordLimit, setWordLimit] = useState(0);
     const [body, setBody] = useState("");
+    const [status, setStatus] = useState("");
 
     function handleText(newText) {
         setBody(newText);
@@ -54,26 +55,43 @@ const Post = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Post</Text>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-                <Text style={styles.title}>Post</Text>
-                <TextInput style={styles.input} multiline={true} maxLength={280} onChangeText={newText => {handleText(newText)}}></TextInput>
+                <TextInput style={styles.input} multiline={true} maxLength={280} onChangeText={newText => {handleText(newText)}} value={body}></TextInput>
 
                 <View style={styles.btnContainer}>
-                    <Text>{wordLimit}/280</Text>
+                    <Text style={styles.charLimit}>{wordLimit}/280</Text>
                     <TouchableOpacity 
                     style={styles.postBtn}
-                    onPress={() => {
+                    onPress={async () => {
                         if (body != "") {
-                            PostQwit();
+                            handleText("");
+                            try {
+                                setStatus("Attempting to post your opinion")
+                                await PostQwit();
+                            } catch (error) {
+                                console.log(error);
+                                setStatus("Failed to post tweet :(")
+                            } finally {
+                                setStatus("Posted successfully")
+                                setTimeout(() => {
+                                    setStatus("")
+                                }, 2000)
+                            }
                         } else {
-                            console.log("Empty Qwit Body")
+                            setStatus("Nothing to Qwit :|");
+
+                            setTimeout(() => {
+                                setStatus("")
+                            }, 2000)
                         }
                     }}
                     >
                         <Text style={styles.btnText}>Post</Text>
                     </TouchableOpacity>
                 </View>
+                <Text>{status}</Text>
             </View>
         </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -84,18 +102,16 @@ export default Post
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: "bold",
         textAlign: "center",
         fontWeight: "400",
         color: "#3b4323",
-        marginVertical: 10,
-        marginTop: 2
     },
     container: {
         flex: 1,
         flexDirection: "column",
-        padding: 15,
+        padding: 20,
         backgroundColor: '#f7f7f8',
     },
     input: {
@@ -126,5 +142,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         margin: 10,
         marginVertical: 6
+    },
+    charLimit: {
+        color: "#999999"
     }
 })
