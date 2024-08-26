@@ -15,11 +15,13 @@ const Search = () => {
         console.log("Attempting to search")
         try {
             const accessToken = await SecureStore.getItemAsync('accessToken');
+            const superUsername = await SecureStore.getItemAsync('username');
 
             const response = await fetch(`http://192.168.100.13:3000/user/search/${username}`, {
                 method: "GET",
                 headers: {
-                    'Authorization' : 'Bearer ' + accessToken
+                    'Authorization' : 'Bearer ' + accessToken,
+                    'Username' : superUsername
                 }
             });
 
@@ -56,9 +58,9 @@ const Search = () => {
   return (
     <SafeAreaView style={styles.container}>
 
-                <Text style={styles.title}>Search</Text>
+                <Text style={styles.title} allowFontScaling={false}>Find Users </Text>
             <View>
-                <TextInput style={styles.input} placeholder='Search' onChangeText={setSearched} value={searched} />
+                <TextInput style={styles.input} placeholder='Search' placeholderTextColor="#808080" onChangeText={setSearched} value={searched} />
                 <ScrollView keyboardShouldPersistTaps="handled">
                 {result? (
                     result.map((res, index) => (

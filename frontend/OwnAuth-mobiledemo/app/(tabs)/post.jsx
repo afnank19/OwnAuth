@@ -2,6 +2,7 @@ import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWitho
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as SecureStore from 'expo-secure-store';
+import { s, vs, ms, mvs } from 'react-native-size-matters';
 
 const Post = () => {
     const [wordLimit, setWordLimit] = useState(0);
@@ -55,13 +56,13 @@ const Post = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Post</Text>
+        <Text style={styles.title} allowFontScaling={false}>Post</Text>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <TextInput style={styles.input} multiline={true} maxLength={280} onChangeText={newText => {handleText(newText)}} value={body}></TextInput>
 
                 <View style={styles.btnContainer}>
-                    <Text style={styles.charLimit}>{wordLimit}/280</Text>
+                    <Text style={styles.charLimit} allowFontScaling={false}>{wordLimit}/280 </Text>
                     <TouchableOpacity 
                     style={styles.postBtn}
                     onPress={async () => {
@@ -88,7 +89,7 @@ const Post = () => {
                         }
                     }}
                     >
-                        <Text style={styles.btnText}>Post</Text>
+                        <Text style={styles.btnText} allowFontScaling={false}>Post </Text>
                     </TouchableOpacity>
                 </View>
                 <Text>{status}</Text>
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
       },
     btnText: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: ms(16),
         fontWeight: "600"
     },
     btnContainer: {
@@ -144,6 +145,8 @@ const styles = StyleSheet.create({
         marginVertical: 6
     },
     charLimit: {
-        color: "#999999"
+        color: "#999999",
+        fontSize: 14,
+        margin: 4,
     }
 })

@@ -20,17 +20,17 @@ export default () => {
         }}>
             <Tabs.Screen name='homepage' options={{
                 headerShown: false,
-                title: "Home",
+                title: "Home ",
                 tabBarIcon: ({color}) => <Ionicons name='home' size={20} color={color} />
             }} />
             <Tabs.Screen name='search' options={{
                 headerShown: false,
-                title: "Search",
+                title: "Search ",
                 tabBarIcon: ({color}) => <Ionicons name='search' size={20} color={color} />
             }} />
             <Tabs.Screen name='post' options={{
                 headerShown: false,
-                title: "Post",
+                title: "Post ",
                 tabBarIcon: ({color}) => <Ionicons name='pencil' size={20} color={color} />
             }} />
         </Tabs>

@@ -190,6 +190,7 @@ app.get('/user/tweets', async (req, res) => {
 app.get('/user/search/:username', async (req, res) => {
     const bearerHeader = req.headers.authorization;
     const token = bearerHeader.split(' ')[1];
+    const superUsername = req.headers.username;
 
     const username = req.params.username;
 
@@ -199,7 +200,8 @@ app.get('/user/search/:username', async (req, res) => {
 
         const usersSnapshot = await admin.firestore().collection('users')
         .where('username', '>=', username)
-        .where('username', '<', username + '\uf8ff') // Inclusive search for usernames starting with 'username'
+        .where('username', '<', username + '\uf8ff')
+        .where('username', '!=', superUsername) // Inclusive search for usernames starting with 'username'
         .get();
 
         const followingSnapshot = await admin.firestore().collection('users').doc(decoded.userID).collection('following').get();

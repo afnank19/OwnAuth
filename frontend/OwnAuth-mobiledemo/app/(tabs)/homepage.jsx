@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RefreshResolve } from '../auth';
 import Tweet from '../../components/tweet';
+import { s, vs, ms, mvs } from 'react-native-size-matters';
 
 const Homepage = () => {
     const [username, setUsername] = useState('Loading..');
@@ -101,7 +102,7 @@ const Homepage = () => {
   return (
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
-        <Text style={styles.title}>Qwitter</Text>
+        <Text style={styles.title} allowFontScaling={false}>Qwitter</Text>
         {/* <Tweet username={tweets[0].username} body={tweets[0].body} timestamp={tweets[0].timeStamp}/>
         <Tweet username={tweets[1].username} body={tweets[1].body}/> */}
         

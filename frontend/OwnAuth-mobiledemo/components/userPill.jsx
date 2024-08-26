@@ -102,6 +102,7 @@ const UserPill = (props) => {
       <TouchableOpacity style={styles.followBtn}>
         <Text
           style={styles.btnText}
+          allowFontScaling={false}
           onPress={() => {
             //console.log(result?.isFollowed);
             //Change the button to following!
@@ -122,7 +123,7 @@ const UserPill = (props) => {
             //API call to follow the user
           }}
         >
-          {result?.isFollowed? 'Following' : 'Follow'}
+          {result?.isFollowed? ' Following ' : ' Follow '}
         </Text>
       </TouchableOpacity>
     </View>

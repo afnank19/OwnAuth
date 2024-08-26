@@ -10,6 +10,11 @@ export async function RefreshResolve() {
     try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
         console.log("refresh: "+refreshToken);
+
+        if(refreshToken == null) {
+            return false;
+        }
+
         const response = await fetch('http://192.168.100.13:3000/refresh', {
             method: "GET",
             headers: {

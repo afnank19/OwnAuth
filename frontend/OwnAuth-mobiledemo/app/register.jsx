@@ -72,37 +72,38 @@ const Register = () => {
         <View style={styles.container}>
           <StatusBar barStyle="dark-content" />
           <View style={styles.container}>
-            <Text style={styles.title}>Register</Text>
+            <Text style={styles.title} allowFontScaling={false}>Register </Text>
           </View>
           <KeyboardAvoidingView
             style={styles.inputContainer}
             behavior="padding"
           >
-            <Text style={styles.inputText}>Username</Text>
             <TextInput
               style={styles.input}
               onChangeText={setUsername}
               value={username}
               placeholder="Username"
+              placeholderTextColor="#808080"
             />
-            <Text style={styles.inputText}>Email</Text>
             <TextInput
               style={styles.input}
               placeholder="Email"
+              placeholderTextColor="#808080"
               onChangeText={setEmail}
               value={email}
             />
-            <Text style={styles.inputText}>Password</Text>
             <TextInput
               secureTextEntry={true}
               style={styles.input}
               onChangeText={setPassword}
               value={password}
               placeholder="Password"
+              placeholderTextColor="#808080"
             />
             <TouchableOpacity style={styles.inputButton}>
               <Text
                 style={styles.buttonText}
+                allowFontScaling={false}
                 onPress={() => {
                   if (email != "" && password != "" && username != "") {
                     setCredentials({
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     margin: 10,
     alignItems: "center",
+    backgroundColor: '#f4f5f2',
   },
   inputContainer: {
     flex: 2,
@@ -151,26 +153,29 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: "bold",
     padding: 100,
+    color: "#3b4323"
   },
   input: {
     height: 50,
     width: 270,
     margin: 10,
-    borderWidth: 1,
-    borderRadius: 8,
+    borderWidth: 2,
+    borderRadius: 14,
     padding: 10,
+    borderColor: "#becb9a"
   },
   inputText: {
     textAlign: "left",
     marginLeft: 14,
     marginBottom: 0,
+    color: "#3b4323"
   },
   inputButton: {
     height: 50,
     width: 270,
     margin: 10,
-    borderRadius: 8,
-    backgroundColor: "#000",
+    borderRadius: 14,
+    backgroundColor: "#5d7029",
     color: "white",
     justifyContent: "center",
   },
@@ -184,6 +189,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   registerLink: {
-    color: "#0086d4",
+    color: "#5d7029",
   },
 });
