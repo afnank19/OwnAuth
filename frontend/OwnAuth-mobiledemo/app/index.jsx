@@ -12,6 +12,7 @@ import {
   Keyboard,
   TouchableOpacity,
   StatusBar,
+  Alert,
 } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router, useRootNavigationState } from "expo-router";
@@ -28,6 +29,8 @@ const Login = () => {
 
   async function VerifyLogin() {
     //Send credentials to API for verification
+    console.log(password);
+
     try {
       const response = await fetch("http://192.168.100.13:3000/login", {
         method: "POST",
@@ -40,6 +43,14 @@ const Login = () => {
         }),
       });
 
+      if(response.status == "400") {
+        Alert.alert("Password did not match");
+        return
+      }
+      if(response.status == '500') {
+        Alert.alert("Couldn't find user or server error :P")
+      }
+
       const data = await response.json();
       //Route to homepage if successful verification
       if (response.ok) {
@@ -49,8 +60,10 @@ const Login = () => {
         router.replace("/homepage");
       }
       console.log(response.status);
+
+
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
 
     async function SetAccessToken(accessToken) {
@@ -140,13 +153,13 @@ const Login = () => {
                     }
                   }}
                 >
-                  Login
+                  Sign In 
                 </Text>
               </TouchableOpacity>
               <Text style={styles.registerText}>
                 New to Qwitter?{" "}
                 <Link href="/register" style={styles.registerLink}>
-                  Register
+                  Sign Up 
                 </Link>
               </Text>
             </KeyboardAvoidingView>
@@ -184,7 +197,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 36,
-    fontWeight: "bold",
     padding: 100,
     color: "#3b4323"
   },

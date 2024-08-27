@@ -7,8 +7,6 @@ const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
-//console.log(process.env.PRIVATE_KEY);
-
 var serviceAccount = require('./secret/ownauth-3d374-firebase-adminsdk-slbqo-e2ead287f2.json');
 const { timeStamp } = require('console');
 //const { error } = require('console');
@@ -25,6 +23,33 @@ const PORT = 3000
 
 app.get('/', (req, res) => {
   res.send('Server is up and alive.')
+})
+
+app.get('/user/unique', async (req, res) => {
+    const API_KEY = req.headers.api_key;
+    const superUsername = req.headers.username;
+
+
+    try {
+        console.log(process.env.API_KEY)
+        console.log(API_KEY + superUsername)
+        if(process.env.API_KEY != API_KEY) {
+            res.status(401).json({available: false})
+        }
+        
+        const userDoc = await db.collection('users').where('username', '==', superUsername).get();
+
+        if(userDoc.empty) {
+            res.status(200).json({available: true})
+        } else {
+            console.log(userDoc.docs[0].data());
+            res.status(400).json({available: false})
+        }
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).send("err");
+    }
 })
 
 app.post('/login',async (req, res) => {
@@ -48,7 +73,7 @@ app.post('/login',async (req, res) => {
 
         if(hashedPword != dbPassword) {
             console.log("password issue")
-            res.status(400).send("Passwords did not match!");
+            res.status(400).json({warning: "passwords did not match"});
         } else {
             //if password is valid
             let tokenData = {
@@ -59,7 +84,7 @@ app.post('/login',async (req, res) => {
             res.status(200).send(data);
         }
     } catch (error) {
-        res.status(500).send("err");
+        res.status(500).json({warning: "couldnt find user or server error"});
     }
 
 
@@ -82,6 +107,7 @@ app.post('/register', async (req, res) => {
         const userData = {
             "username": bodyData.username,
             "email": bodyData.email,
+            "bio": bodyData.bio,
             "password": hashedPword,
             "salt": salt
         }
@@ -158,6 +184,7 @@ app.get('/user' , async (req, res) => {
 
         const result = {
             username: userDoc.data().username,
+            bio: userDoc.data().bio
             //Add Bio to this as well
             // followerCount: userFollowers.data().count,
             // followingCount: userFollowing.data().count

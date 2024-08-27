@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient} from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
 const Profile = () => {
@@ -44,6 +44,21 @@ const Profile = () => {
         }
     }
 
+    async function SignOut() {
+        console.log("Signing out! :(");
+        
+        try {
+            await SecureStore.deleteItemAsync('refreshToken');
+            await SecureStore.deleteItemAsync('accessToken');
+            await SecureStore.deleteItemAsync('username');
+
+            router.replace('/');
+        } catch (error) {
+            console.error(error);
+            console.log("Error Signing out");
+        }
+    }
+
     useEffect(() => {
         console.log(user);
     }, [])
@@ -68,13 +83,11 @@ const Profile = () => {
                     </View>
                     <View>
                         <Text style = { styles.bioHeading }>Bio: </Text>
-                        <Text style = { styles.bioContent }>focus. control. conviction</Text>
+                        <Text style = { styles.bioContent }>{user.bio}</Text>
                     </View>
                 </View>
-                <TouchableOpacity style = { styles.signOut}>
-                    <Text >
-                        Sign out
-                    </Text>
+                <TouchableOpacity style = { styles.signOut} onPress={() => {SignOut()}}>
+                    <Text allowFontScaling={false}> Sign out </Text>
                 </TouchableOpacity>
             </View>
         </LinearGradient>
@@ -82,7 +95,7 @@ const Profile = () => {
             <Text style ={ styles.aboutHeading }>About the project</Text>
             <Text allowFontScaling={false} style = { styles.aboutContent}>
                 Qwitter is inspired by the film "The Social Network" where Mark Zuckerberg codes 
-                Facebook in a week, so I decided to do the same for fun. This project initially started
+                Facebook in a week. I decided to do the same for fun. This project initially started
                 out with just creating a backend Auth system, and I couldn't let my own custom Auth go to 
                 waste, so Qwitter was born. It's still very premature, but hey, we can look past that. Hope you enjoy
                 as much as I did in building this!

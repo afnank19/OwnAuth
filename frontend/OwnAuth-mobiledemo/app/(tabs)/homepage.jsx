@@ -93,9 +93,18 @@ const Homepage = () => {
         // }, 2000);
     }
 
+    async function GetUserAndTweets() {
+        try {
+            await fetchUser();
+        } catch (error) {
+            
+        } finally {
+            getTweets();
+        }
+    }
+
     useEffect(() => {
-        fetchUser();
-        getTweets();
+        GetUserAndTweets();
     },[])
 
   return (

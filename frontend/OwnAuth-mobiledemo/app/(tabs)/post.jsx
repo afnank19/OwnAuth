@@ -59,7 +59,7 @@ const Post = () => {
         <Text style={styles.title} allowFontScaling={false}>Post</Text>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-                <TextInput style={styles.input} multiline={true} maxLength={280} onChangeText={newText => {handleText(newText)}} value={body}></TextInput>
+                <TextInput style={styles.input} multiline={true} maxLength={280} onChangeText={newText => {handleText(newText)}} value={body} textAlignVertical='top' allowFontScaling={false}></TextInput>
 
                 <View style={styles.btnContainer}>
                     <Text style={styles.charLimit} allowFontScaling={false}>{wordLimit}/280 </Text>
@@ -69,7 +69,6 @@ const Post = () => {
                         if (body != "") {
                             handleText("");
                             try {
-                                setStatus("Attempting to post your opinion")
                                 await PostQwit();
                             } catch (error) {
                                 console.log(error);
@@ -89,7 +88,7 @@ const Post = () => {
                         }
                     }}
                     >
-                        <Text style={styles.btnText} allowFontScaling={false}>Post </Text>
+                        <Text style={styles.btnText} allowFontScaling={false}> Post </Text>
                     </TouchableOpacity>
                 </View>
                 <Text>{status}</Text>
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         marginVertical: 10,
         padding: 10,
-        fontSize: 16
+        fontSize: 16,
     },
     postBtn: {
         backgroundColor: "#5d7029",
