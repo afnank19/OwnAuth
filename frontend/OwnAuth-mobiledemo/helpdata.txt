@@ -8,11 +8,11 @@ like system? that is fast perhaps??? if firebase offers free realtime listeners
 
 
 BUGS:
-Fix search loader even when not searching,
-Fix all styles
-Fix NULL types
-Fix Icons
-Fix Tab Bar
+Fix search loader even when not searching, [OK]
+Fix all styles [OK]
+Fix NULL types [OK]
+Fix Icons [OK]
+Fix Tab Bar [OK]
 
 new pallete:
 --text: #110d08;

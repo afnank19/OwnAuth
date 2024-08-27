@@ -145,6 +145,75 @@ app.get('/homepage', async (req, res) => {
     }
 })
 
+app.get('/user' , async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    try {
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+
+        const userDoc = await db.collection('users').doc(decoded.userID).get();
+        // const userFollowers = await db.collection('users').doc(decoded.userID).collection('followers').count().get();
+        // const userFollowing = await db.collection('users').doc(decoded.userID).collection('following').count().get();
+
+        const result = {
+            username: userDoc.data().username,
+            //Add Bio to this as well
+            // followerCount: userFollowers.data().count,
+            // followingCount: userFollowing.data().count
+        }
+
+        console.log(result);
+        // console.log(userFollowers.data().count);
+        // console.log(userFollowing.data().count);
+
+        res.status(200).json(result);
+
+    } catch (error) {
+        console.log(error);
+
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
+app.get('/user/metrics' , async (req, res) => {
+    const bearerHeader = req.headers.authorization;
+    const token = bearerHeader.split(' ')[1];
+
+    try {
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+
+        const userFollowers = await db.collection('users').doc(decoded.userID).collection('followers').count().get();
+        const userFollowing = await db.collection('users').doc(decoded.userID).collection('following').count().get();
+
+        const result = {
+            followerCount: userFollowers.data().count,
+            followingCount: userFollowing.data().count
+        }
+
+        console.log(result);
+        // console.log(userFollowers.data().count);
+        // console.log(userFollowing.data().count);
+
+        res.status(200).json(result);
+
+    } catch (error) {
+        console.log(error);
+
+        if(error.name === 'TokenExpiredError') {
+            console.log("expired token")
+            res.status(401).send(error);
+        } else { 
+            res.status(500).send(error);
+        }
+    }
+})
+
 app.get('/user/tweets', async (req, res) => {
     const bearerHeader = req.headers.authorization;
     const token = bearerHeader.split(' ')[1];

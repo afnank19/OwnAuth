@@ -1,7 +1,49 @@
 import { Tabs } from "expo-router"
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useEffect, useState } from "react";
+import * as SecureStore from 'expo-secure-store';
 
 export default () => {
+    const [user, setUser] = useState({});
+
+    async function initUser() {
+        try {
+            const accessToken = await SecureStore.getItemAsync('accessToken');
+            const response = await fetch('http://192.168.100.13:3000/user', {
+                method: "GET",
+                headers: {
+                    'Authorization' : 'Bearer ' + accessToken
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log(data);
+
+                setUser(data);
+                //setUsername(data.username);
+                //await SecureStore.setItemAsync('username', data.username)
+            }
+            if (response.status == "401") {
+                //const refreshToken = await SecureStore.getItemAsync('refreshToken');
+                console.log("Access Token Expired, fetching new token!")
+                let areTokensSet = false
+                areTokensSet = await RefreshResolve();
+                if (areTokensSet == true) {
+                    initUser();
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        console.log("Fetching user info before tweets")
+        initUser();
+    }, [])
+
+
     return(
         <Tabs screenOptions={
             {tabBarActiveTintColor: '#93a857',
@@ -33,6 +75,11 @@ export default () => {
                 title: "Post ",
                 tabBarIcon: ({color}) => <Ionicons name='pencil' size={20} color={color} />
             }} />
+            <Tabs.Screen name='profile' options={{
+                headerShown: false,
+                title: "Profile ",
+                tabBarIcon: ({color}) => <Ionicons name='person-circle-outline' size={20} color={color} />
+            }} initialParams={ user }/>
         </Tabs>
     )
 }

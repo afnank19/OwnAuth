@@ -14,7 +14,6 @@ const Homepage = () => {
     async function fetchUser() {
         try {
             const accessToken = await SecureStore.getItemAsync('accessToken');
-            console.log("token: " + accessToken);
             const response = await fetch('http://192.168.100.13:3000/homepage', {
                 method: "GET",
                 headers: {
@@ -61,7 +60,7 @@ const Homepage = () => {
             console.log(response.status);
             const data = await response.json();
             if(response.ok) {
-                console.log(data);
+                //console.log(data);
                 setTweets(data);
             }
             if (response.status == "401"){
