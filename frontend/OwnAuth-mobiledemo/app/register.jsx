@@ -35,7 +35,7 @@ const Register = () => {
     try {
         console.log(JSON.stringify(credentials) + "+]");
 
-        const response = await fetch('http://192.168.100.13:3000/register', {
+        const response = await fetch('https://rowan-brass-humerus.glitch.me/register', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Register = () => {
         return;
       }
 
-      const response = await fetch('http://192.168.100.13:3000/user/unique', {
+      const response = await fetch('https://rowan-brass-humerus.glitch.me/user/unique', {
         method: "GET",
         headers: {
             'api_key': '76c1f850-8851-415f-879c-53a598296235',

@@ -13,7 +13,7 @@ const UserPill = (props) => {
             const username = await SecureStore.getItemAsync('username');
             console.log(username);
 
-            const response = await fetch(`http://192.168.100.13:3000/user/follower/${username}`, {
+            const response = await fetch(`https://rowan-brass-humerus.glitch.me/user/follower/${username}`, {
                 method: "POST",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken,
@@ -51,7 +51,7 @@ const UserPill = (props) => {
         const username = await SecureStore.getItemAsync('username');
         console.log(username);
 
-        const response = await fetch(`http://192.168.100.13:3000/user/follower/${username}`, {
+        const response = await fetch(`https://rowan-brass-humerus.glitch.me/user/follower/${username}`, {
             method: "DELETE",
             headers: {
                 'Authorization' : 'Bearer ' + accessToken,

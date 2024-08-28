@@ -14,7 +14,7 @@ const Homepage = () => {
     async function fetchUser() {
         try {
             const accessToken = await SecureStore.getItemAsync('accessToken');
-            const response = await fetch('http://192.168.100.13:3000/homepage', {
+            const response = await fetch('https://rowan-brass-humerus.glitch.me/homepage', {
                 method: "GET",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken
@@ -49,7 +49,7 @@ const Homepage = () => {
             console.log(username);
 
             console.log("fetching tweets");
-            const response = await fetch('http://192.168.100.13:3000/user/tweets', {
+            const response = await fetch('https://rowan-brass-humerus.glitch.me/user/tweets', {
                 method: "GET",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken,

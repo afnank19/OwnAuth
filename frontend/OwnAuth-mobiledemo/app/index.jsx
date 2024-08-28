@@ -32,7 +32,7 @@ const Login = () => {
     console.log(password);
 
     try {
-      const response = await fetch("http://192.168.100.13:3000/login", {
+      const response = await fetch("https://rowan-brass-humerus.glitch.me/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

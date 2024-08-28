@@ -15,7 +15,7 @@ export async function RefreshResolve() {
             return false;
         }
 
-        const response = await fetch('http://192.168.100.13:3000/refresh', {
+        const response = await fetch('https://rowan-brass-humerus.glitch.me/refresh', {
             method: "GET",
             headers: {
                 'Authorization' : 'Bearer ' + refreshToken

@@ -21,7 +21,7 @@ const Post = () => {
             const username = await SecureStore.getItemAsync('username');
             console.log(username);
 
-            const response = await fetch(`http://192.168.100.13:3000/user/tweet`, {
+            const response = await fetch(`https://rowan-brass-humerus.glitch.me/user/tweet`, {
                 method: "POST",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken,

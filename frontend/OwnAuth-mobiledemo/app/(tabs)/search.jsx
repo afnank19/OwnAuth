@@ -17,7 +17,7 @@ const Search = () => {
             const accessToken = await SecureStore.getItemAsync('accessToken');
             const superUsername = await SecureStore.getItemAsync('username');
 
-            const response = await fetch(`http://192.168.100.13:3000/user/search/${username}`, {
+            const response = await fetch(`https://rowan-brass-humerus.glitch.me/user/search/${username}`, {
                 method: "GET",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken,
