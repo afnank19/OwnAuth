@@ -15,7 +15,7 @@ const Profile = () => {
     async function GetUserMetrics() {
         try {
             const accessToken = await SecureStore.getItemAsync('accessToken');
-            const response = await fetch('http://192.168.100.13:3000/user/metrics', {
+            const response = await fetch('https://rowan-brass-humerus.glitch.me/user/metrics', {
                 method: "GET",
                 headers: {
                     'Authorization' : 'Bearer ' + accessToken
