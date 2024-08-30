@@ -8,11 +8,25 @@ const Post = () => {
     const [wordLimit, setWordLimit] = useState(0);
     const [body, setBody] = useState("");
     const [status, setStatus] = useState("");
+    const [time, setTime] = useState("");
 
     function handleText(newText) {
         setBody(newText);
         setWordLimit(newText.length);
     }
+
+    function getCurrentTimeAndDate() {
+        const now = new Date();
+      
+        // Format the time and date
+        const options = { hour: 'numeric', minute: '2-digit' };
+        const timeString = now.toLocaleTimeString('en-US', options);
+      
+        const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+        const dateString = now.toLocaleDateString('en-US', dateOptions);
+      
+        return `${timeString} ${dateString}`;
+      }
 
     async function PostQwit() {
         console.log("Attempting to post a qwit")
@@ -20,6 +34,8 @@ const Post = () => {
             const accessToken = await SecureStore.getItemAsync('accessToken');
             const username = await SecureStore.getItemAsync('username');
             console.log(username);
+            const qwitTime = getCurrentTimeAndDate();
+            console.log(qwitTime)
 
             const response = await fetch(`https://rowan-brass-humerus.glitch.me/user/tweet`, {
                 method: "POST",
@@ -29,7 +45,8 @@ const Post = () => {
                 },
                 body: JSON.stringify({
                     body: body,
-                    username: username
+                    username: username,
+                    timeStamp: qwitTime
                 })
             });
 
@@ -68,6 +85,9 @@ const Post = () => {
                     onPress={async () => {
                         if (body != "") {
                             handleText("");
+                            const currentTime = getCurrentTimeAndDate();
+                            console.log(currentTime);
+                            //setTime(currentTime);
                             try {
                                 await PostQwit();
                             } catch (error) {

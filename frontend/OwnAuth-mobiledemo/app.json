@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "OwnAuth-mobiledemo",
+    "name": "Qwitter Preview",
     "slug": "OwnAuth-mobiledemo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.afnank19.OwnAuthmobiledemo"
     },
     "web": {
       "bundler": "metro",
@@ -32,6 +33,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3629b190-3f30-4804-9203-3a9d078136c3"
+      }
     }
   }
 }
